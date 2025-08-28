@@ -15,14 +15,10 @@ import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.util.Logger;
 import com.yandex.disk.rest.util.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import okhttp3.internal.Util;
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.Okio;
@@ -95,10 +91,21 @@ import okio.Source;
                     }
                     logger.debug("loaded: " + loaded);
                 } finally {
-                    Util.closeQuietly(source);
-                    Util.closeQuietly(inputStream);
+                    closeQuietly(source);
+                    closeQuietly(inputStream);
                 }
             }
         };
+    }
+
+    public static void closeQuietly(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (RuntimeException rethrown) {
+                throw rethrown;
+            } catch (Exception ignored) {
+            }
+        }
     }
 }
